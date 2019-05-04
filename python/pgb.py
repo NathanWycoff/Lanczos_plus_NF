@@ -35,43 +35,30 @@ plt.imshow(density)
 plt.savefig('temp.pdf')
 
 # Define an invertible neural network
-L = 1
+W = tf.Variable(np.random.normal(size=[P,P]))
 nonlin = lambda x: 1. / (1. + tf.exp(-x))
-dnonlin = lambda x: nonlin(x) * (1 - nonlin(x))
-
-# A test vector
 x = tf.Variable(np.random.normal(size=[1,P]))
 
-# Define our weight tensor.
-# Warning: Due to the way we've configured things, each weight matrix is really its tranpose.
-W = tf.Variable(np.random.normal(size=[P,P,L]))*0.1
-
-def fpass(x):
-    z = x
-    for l in range(L):
-        z = nonlin(tf.linalg.matmul(z,W[:,:,l]))
-    return z
+# Test get_jac
+#h = 1e-6
+#xh = np.empty([1,P])
+#xh[:] = x
+#xh[0,1] += h
+#
+#(nonlin(xh.dot(W)) - nonlin(x.dot(W))) / h
 
 def get_jac(x):
-    z = x
-    jac = tf.eye(P, dtype = tf.float64)
-    for l in range(L):
-        zW = tf.linalg.matmul(z,W[:,:,l])
-        al = dnonlin(zW)
-        jac = al * (tf.linalg.matmul(jac, W[:,:,l]))
-        z = nonlin(zW)
-    return jac
+    a = nonlin(tf.linalg.matmul(x, W)) * (1 - nonlin(tf.linalg.matmul(x, W)))
+    return a * W
 
 def neural_density(x):
     J = get_jac(x)
     return -tf.linalg.logdet(tf.matmul(J,tf.transpose(J))) * 0.5
 
-## Can we compute a gradient WRT weights for backprop?
 with tf.GradientTape() as t:
     dens = neural_density(x)
 t.gradient(dens, W)
 
-# See what the prior density looks like.
 density = np.empty([res,res])
 for i,x in enumerate(ticks):
     for j,y in enumerate(ticks):
