@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 #  python/playground.py Author "Nathan Wycoff <nathanbrwycoff@gmail.com>" Date 05.03.2019
 
+#TODO: Biases; non-square weights.
+
 # See if we can get Multiple Gaussian peaks, using naive determinant calculation.
 import tensorflow as tf
 import keras
@@ -66,3 +68,5 @@ for i,x in enumerate(ticks):
 
 plt.imshow(density)
 plt.savefig('temp.pdf')
+
+## Optimize to fit the target density

@@ -1,0 +1,4 @@
+Computing the inverse of our neural net involves computing several large linear system solves.
+We could mitigate this using iterating methods (such as CG), by having a separate "inverse network" as in Rippel and Adams, or by constraining weights to be unitary (https://arxiv.org/pdf/1612.04035.pdf).
+
+The range of the neural net is restricted by its sigmoidal activation function, which means it is not presently a surjective function.
